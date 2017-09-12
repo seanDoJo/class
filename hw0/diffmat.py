@@ -25,18 +25,41 @@ def diffmat(x):
 	hmat = numpy.repeat(h, x.size).reshape((x.size, x.size))
 	D = D * hmat
 
-	return D	
+	return D
+
+def diffmat2(x):
+    # calculate the left-looking grid space for each point
+    h_interior = x[1:] - x[:-1]
+
+    e = numpy.ones_like(x)
+    D = numpy.diag(e)
+
+    for i in range(1, x.size-1):
+        # for unevenly spaced grids we can't assume the exterior denominator is 1/(h*h), and is instead 1/(0.5*(hl+hr)*(hlhr))
+        denom = 0.5*(h_interior[(i-1)] + h_interior[i])*(h_interior[(i-1)]*h_interior[i])
+        
+        # again, since unevenly spaced grids don't have hl = hr, rewriting the equation makes the stencil [hl -(hl+hr) hr]
+        D[i, (i-1):(i+2)] = numpy.array([h_interior[(i-1)], -(h_interior[(i-1)] + h_interior[i]), h_interior[i]]) / denom
+    
+    # TODO: incorrectly calculated, done in notebook
+    leftDenom = 0.5*(h_interior[0]+h_interior[1])*(h_interior[0]*h_interior[1])
+    D[0, 0:3] = numpy.array([h_interior[0], -2*h_interior[1], (2*h_interior[1]-h_interior[0])])/leftDenom
+
+    #print D
+    return D
+    
 	
 
 if __name__ == '__main__':
-	x = numpy.linspace(0, 8, 20)
-	y = numpy.sin(x)
-	L = diffmat(x)
+	x = numpy.linspace(0.27, 3, 10)
+        #x = numpy.array([k**1.5 for k in range(10)])
+	y = numpy.cos(x)
+	L = diffmat2(x)
 	ay = L.dot(y)
 
 	pyplot.figure()
 	pyplot.plot(x, ay, 'o', label='analytical')
-	pyplot.plot(x, numpy.cos(x), label='exact')
+	pyplot.plot(x, -numpy.cos(x), label='exact')
 	pyplot.legend(loc='upper left')
 	pyplot.show()
 
