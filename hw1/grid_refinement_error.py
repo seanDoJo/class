@@ -12,7 +12,7 @@ if __name__ == '__main__':
     for gridSize in grids:
         x, L, rhs = ode_cheb(1, 1, cosPoints_f, gridSize)
         u_n = numpy.linalg.solve(L, rhs)
-        u_n = u_n[0:gridSize+1]
+        u_n = u_n[0:gridSize]
         u = (numpy.cos(x) - 1)
         err = numpy.linalg.norm((u - u_n), numpy.inf)
         errs_inf.append(err)
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     for gridSize in grids:
         x, L, rhs = ode_cheb(1, 1, xCubed_f, gridSize)
         u_n = numpy.linalg.solve(L, rhs)
-        u_n = u_n[0:gridSize+1]
+        u_n = u_n[0:gridSize]
         u = (x*x*x)
         err = numpy.linalg.norm((u - u_n), numpy.inf)
         errs_inf.append(err)
